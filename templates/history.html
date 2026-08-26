@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Scan History — Sentinel AI{% endblock %}
+
+{% block content %}
+<div>
+  <div class="chip sev-info mb-3"><i data-lucide="scroll-text" class="w-3 h-3"></i> Scan History</div>
+  <h1 class="text-3xl font-extrabold tracking-tight">All scans</h1>
+  <p class="text-slate-500 mt-2 text-sm">{{ scans|length }} scan{{ 's' if scans|length != 1 }} total.</p>
+</div>
+
+<div class="glass rounded-2xl p-6">
+  {% if not scans %}
+    <div class="text-center py-8">
+      <i data-lucide="inbox" class="w-10 h-10 mx-auto text-slate-300 mb-3"></i>
+      <p class="text-slate-500 text-sm">No scans yet. <a href="{{ url_for('index') }}" class="text-violet-600 hover:underline">Run your first scan</a>.</p>
+    </div>
+  {% else %}
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <th class="pb-3 pr-2">File</th>
+          <th class="pb-3 pr-2">Uploaded</th>
+          <th class="pb-3 pr-2">Log Type</th>
+          <th class="pb-3 pr-2">Findings</th>
+          <th class="pb-3 pr-2">Risk</th>
+          <th class="pb-3"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for scan in scans %}
+        <tr class="log-row border-t border-slate-100">
+          <td class="py-3 pr-2 font-medium">{{ scan.filename }}</td>
+          <td class="py-3 pr-2 text-slate-500 mono text-xs">{{ scan.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</td>
+          <td class="py-3 pr-2 text-slate-500">{{ scan.log_type }}</td>
+          <td class="py-3 pr-2">{{ scan.findings.count() }}</td>
+          <td class="py-3 pr-2"><span class="chip sev-{{ scan.overall_risk()|lower }}">{{ scan.overall_risk() }}</span></td>
+          <td class="py-3"><a href="{{ url_for('scan_results', scan_id=scan.id) }}" class="text-violet-600 hover:underline text-xs font-semibold">View &rarr;</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
